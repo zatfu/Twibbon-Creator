@@ -190,7 +190,7 @@
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {
-        const registration = await navigator.serviceWorker.register('/sw.js');
+        const registration = await navigator.serviceWorker.register('sw.js');
         console.log('SW registered:', registration);
         
         registration.addEventListener('updatefound', () => {
