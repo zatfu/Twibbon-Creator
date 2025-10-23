@@ -4,11 +4,11 @@ const DYNAMIC_CACHE = 'twibbon-dynamic-v1';
 
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
-  '/manifest.json',
-  '/twibbon.png',
-  '/script.js',
-  '/tailwindcdn.js',
+  'index.html',
+  'manifest.json',
+  'twibbon.png',
+  'script.js',
+  'tailwindcdn.js',
   'https://cdn.jsdelivr.net/npm/sweetalert2@11'
 ];
 
