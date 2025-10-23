@@ -1,5 +1,4 @@
 (() => {
-  // ====== ELEMENTS ======
   const d = document;
   const box = d.getElementById('canvasBox');
   const canvas = d.getElementById('stage');
@@ -19,34 +18,29 @@
   const shareBtn = d.getElementById('shareBtn');
   const resetAllTop = d.getElementById('resetAllTop');
 
-  // Camera elements
   const cameraModal = d.getElementById('cameraModal');
   const cameraPreview = d.getElementById('cameraPreview');
   const captureBtn = d.getElementById('captureBtn');
   const switchCameraBtn = d.getElementById('switchCameraBtn');
   const closeCameraBtn = d.getElementById('closeCameraBtn');
 
-  // Photo controls
   const photoControls = d.getElementById('photoControls');
   const brightnessSlider = d.getElementById('brightnessSlider');
   const contrastSlider = d.getElementById('contrastSlider');
   const saturationSlider = d.getElementById('saturationSlider');
   const blurSlider = d.getElementById('blurSlider');
 
-  // Transform controls
   const fitBtn = d.getElementById('fitBtn');
   const centerBtn = d.getElementById('centerBtn');
   const rotateLeftBtn = d.getElementById('rotateLeftBtn');
   const rotateRightBtn = d.getElementById('rotateRightBtn');
   const customTwibbonBtn = d.getElementById('customTwibbonBtn');
 
-  // PWA Elements
   const installBanner = d.getElementById('installBanner');
   const installBtn = d.getElementById('installBtn');
   const dismissInstall = d.getElementById('dismissInstall');
   const networkStatus = d.getElementById('networkStatus');
 
-  // ====== STATE ======
   let hasImage = false;
   let img = null;
   let gesturesEnabled = true;
@@ -55,11 +49,9 @@
   let processing = false;
   let currentCamera = 'user'; // 'user' for front camera, 'environment' for back camera
 
-  // Transform state
   let scale = 1, minScale = 0.2, maxScale = 5;
   let tx = 0, ty = 0;
 
-  // Photo filters
   let filters = {
     brightness: 100,
     contrast: 100,
@@ -67,20 +59,16 @@
     blur: 0
   };
 
-  // Pointer tracking
   const pointers = new Map();
   let raf = null;
   let dirty = true;
 
-  // Twibbon
   const TWIBBON_DEFAULT_URL = 'twibbon.png';
   let twibbon = null;
 
-  // PWA State
   let deferredPrompt = null;
   let isOnline = navigator.onLine;
 
-  // ====== HELPERS ======
   const DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
 
   function resizeCanvasToBox(){
@@ -97,7 +85,7 @@
   }
 
   function clear(){
-    ctx.fillStyle = '#f1f5f9'; // slate-100 color for light mode
+    ctx.fillStyle = '#f1f5f9';
     ctx.fillRect(0, 0, canvas.width/DPR, canvas.height/DPR);
   }
 
@@ -108,15 +96,12 @@
     
     const W = canvas.width / DPR, H = canvas.height / DPR;
     
-    // Draw user image with filters and rotation
     if (hasImage && img){
       ctx.save();
       
-      // Apply filters
       const filterStr = `brightness(${filters.brightness}%) contrast(${filters.contrast}%) saturate(${filters.saturation}%) blur(${filters.blur}px)`;
       ctx.filter = filterStr;
       
-      // Apply transforms
       ctx.translate(W/2 + tx, H/2 + ty);
       ctx.scale(scale, scale);
       ctx.rotate((imageRotation * Math.PI) / 180);
@@ -125,14 +110,12 @@
       ctx.restore();
     }
     
-    // Draw twibbon overlay
     if (hasImage && twibbon && twibbon.complete && twibbon.naturalWidth) {
       const r = Math.max(W / twibbon.width, H / twibbon.height);
       const twW = twibbon.width * r, twH = twibbon.height * r;
       ctx.drawImage(twibbon, (W - twW)/2, (H - twH)/2, twW, twH);
     }
     
-    // Draw grid when no image
     if (!hasImage) {
       ctx.strokeStyle = 'rgba(156, 163, 175, 0.1)';
       const step = 32;
@@ -161,8 +144,6 @@
     dirty = true; 
   }
 
-  // ====== ALERT SYSTEM WITH SWEETALERT2 ======
-  
   function showAlert(message, type = 'error') {
     const config = {
       text: message,
@@ -205,16 +186,13 @@
     }
   }
 
-  // ====== PWA FUNCTIONALITY ======
   
-  // Register Service Worker
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', async () => {
       try {
         const registration = await navigator.serviceWorker.register('/sw.js');
         console.log('SW registered:', registration);
         
-        // Listen for updates
         registration.addEventListener('updatefound', () => {
           const newWorker = registration.installing;
           newWorker.addEventListener('statechange', () => {
@@ -229,12 +207,10 @@
     });
   }
 
-  // PWA Install Prompt
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
     
-    // Show install banner
     if (!localStorage.getItem('installDismissed')) {
       setTimeout(() => {
         installBanner.classList.add('translate-y-0');
@@ -248,7 +224,6 @@
     installBanner.classList.remove('translate-y-0');
   }
 
-  // Network Status
   function updateNetworkStatus() {
     const wasOnline = isOnline;
     isOnline = navigator.onLine;
@@ -262,7 +237,6 @@
     }
   }
 
-  // Handle URL parameters for shortcuts
   function handleURLParams() {
     const params = new URLSearchParams(window.location.search);
     const action = params.get('action');
@@ -277,7 +251,6 @@
     }
   }
 
-  // Enhanced button animations
   function addButtonAnimation(button) {
     button.addEventListener('click', function(e) {
       const ripple = document.createElement('span');
@@ -299,7 +272,6 @@
     });
   }
 
-  // Focus management
   function manageFocus() {
     const focusableElements = d.querySelectorAll('button, input, [tabindex]:not([tabindex="-1"])');
     focusableElements.forEach((el, index) => {
@@ -317,32 +289,26 @@
     });
   }
 
-  // ====== ENHANCED CAMERA INTEGRATION FOR ANDROID ======
   async function startCamera() {
     try {
-      // Show loading state
       cameraFab.disabled = true;
       cameraFab.innerHTML = '<span class="animate-spin">⏳</span> Membuka...';
 
-      // Stop existing stream first
       if (cameraStream) {
         stopCamera();
       }
 
-      // Enhanced constraints for better Android compatibility
       const constraints = {
         video: {
           width: { ideal: 1920, min: 640 },
           height: { ideal: 1080, min: 480 },
           facingMode: currentCamera,
-          // Additional Android-specific constraints
           frameRate: { ideal: 30, min: 15 },
           aspectRatio: { ideal: 16/9 }
         },
         audio: false
       };
 
-      // Try with preferred constraints first
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         cameraPreview.srcObject = stream;
@@ -350,13 +316,11 @@
         cameraModal.classList.remove('hidden');
         cameraModal.classList.add('flex');
         
-        // Show switch camera button if multiple cameras available
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
         switchCameraBtn.style.display = videoDevices.length > 1 ? 'block' : 'none';
         
       } catch (err) {
-        // Fallback to basic constraints for Android compatibility
         console.warn('Primary camera constraints failed, trying fallback:', err);
         
         const fallbackConstraints = {
@@ -391,7 +355,6 @@
       
       showAlert(errorMessage, 'error');
     } finally {
-      // Reset button state
       cameraFab.disabled = false;
       cameraFab.innerHTML = '<span class="flex items-center gap-2"><span class="text-lg">📸</span><span class="hidden sm:inline">Kamera</span></span>';
     }
@@ -422,11 +385,9 @@
     const captureCanvas = d.createElement('canvas');
     const captureCtx = captureCanvas.getContext('2d');
     
-    // Use video dimensions for better quality
     captureCanvas.width = cameraPreview.videoWidth || 1280;
     captureCanvas.height = cameraPreview.videoHeight || 720;
     
-    // Draw the current video frame
     captureCtx.drawImage(cameraPreview, 0, 0, captureCanvas.width, captureCanvas.height);
     
     captureCanvas.toBlob(blob => {
@@ -440,7 +401,6 @@
     }, 'image/jpeg', 0.95);
   }
 
-  // ====== IMAGE LOADING ======
   function loadUserImage(file){
     if (!file) return;
     const url = URL.createObjectURL(file);
@@ -460,7 +420,6 @@
       ph.style.display = 'none';
       photoControls.classList.remove('hidden');
       
-      // Reset filters and rotation
       filters = { brightness: 100, contrast: 100, saturation: 100, blur: 0 };
       imageRotation = 0;
       updateFilterSliders();
@@ -488,7 +447,6 @@
     const url = URL.createObjectURL(file);
     const _tw = new Image();
     _tw.onload = () => {
-      // Check transparency
       const tempCanvas = d.createElement('canvas');
       tempCanvas.width = _tw.width;
       tempCanvas.height = _tw.height;
@@ -520,7 +478,6 @@
     _tw.src = url;
   }
 
-  // ====== TRANSFORM FUNCTIONS ======
   function fitImageToCanvas() {
     if (!hasImage || !img) return;
     const W = canvas.width / DPR, H = canvas.height / DPR;
@@ -542,7 +499,6 @@
     scheduleDraw();
   }
 
-  // ====== FILTER FUNCTIONS ======
   function updateFilterSliders() {
     brightnessSlider.value = filters.brightness;
     contrastSlider.value = filters.contrast;
@@ -550,7 +506,6 @@
     blurSlider.value = filters.blur;
   }
 
-  // ====== DOWNLOAD FUNCTIONS ======
   function downloadImage(format = 'png', quality = 0.9) {
     const link = d.createElement('a');
     link.download = `twibbon.${format}`;
@@ -566,7 +521,6 @@
     link.click();
   }
 
-  // ====== GESTURES ======
   canvas.style.touchAction = 'none';
   let last = {x:0, y:0};
   let pinch = null;
@@ -584,15 +538,12 @@
     return Math.hypot(dx,dy); 
   }
 
-  // ====== EVENT LISTENERS ======
-  
-  // Camera controls
+
   cameraFab.addEventListener('click', startCamera);
   captureBtn.addEventListener('click', capturePhoto);
   switchCameraBtn.addEventListener('click', switchCamera);
   closeCameraBtn.addEventListener('click', stopCamera);
 
-  // Photo filter controls
   brightnessSlider.addEventListener('input', (e) => {
     filters.brightness = e.target.value;
     scheduleDraw();
@@ -613,13 +564,11 @@
     scheduleDraw();
   });
 
-  // Transform controls
   fitBtn.addEventListener('click', fitImageToCanvas);
   centerBtn.addEventListener('click', centerImage);
   rotateLeftBtn.addEventListener('click', () => rotateImage(-90));
   rotateRightBtn.addEventListener('click', () => rotateImage(90));
 
-  // File inputs
   pickerFab.addEventListener('click', (e) => {
     e.stopPropagation();
     fileInput.click();
@@ -639,7 +588,6 @@
     twibbonInput.value = '';
   });
 
-  // Download controls
   dlBtn.addEventListener('click', () => downloadImage('png'));
   dlJpgBtn.addEventListener('click', () => downloadImage('jpg'));
   dlWebpBtn.addEventListener('click', () => downloadImage('webp'));
@@ -652,7 +600,6 @@
         try{ 
           await navigator.share({ files:[file], title:'Twibbon', text:'Hasil twibbon saya' }); 
         } catch(e){
-          // User cancelled or share failed
         }
       } else {
         const url = URL.createObjectURL(blob);
@@ -662,7 +609,6 @@
     });
   });
 
-  // Twibbon presets (simplified to only default)
   d.querySelectorAll('.twibbonPreset').forEach(btn => {
     btn.addEventListener('click', () => {
       const twibbonUrl = btn.dataset.twibbon;
@@ -681,8 +627,6 @@
 
 
 
-  // ====== INIT ======
-  // Load default twibbon
   (function preloadTwibbon(){
     const im = new Image();
     im.onload = ()=>{ 
@@ -695,22 +639,17 @@
   resizeCanvasToBox();
   scheduleDraw();
 
-  // Initialize PWA features
   handleURLParams();
   manageFocus();
   updateNetworkStatus();
   
-  // Add ripple effects to buttons
   d.querySelectorAll('button').forEach(addButtonAnimation);
   
-  // Add loading states to all async buttons
   [pickerFab, cameraFab, processBtn].forEach(btn => {
     btn.setAttribute('aria-label', btn.textContent);
   });
 
-  // ====== MISSING EVENT HANDLERS ======
   
-  // Process button - create twibbon with countdown
   processBtn.addEventListener('click', () => {
     if (!hasImage || processing) return;
     
@@ -719,7 +658,6 @@
     processBtn.textContent = 'Memproses...';
     gesturesEnabled = false;
     
-    // Show countdown modal
     mask.classList.remove('hidden');
     mask.classList.add('flex');
     
@@ -742,7 +680,6 @@
         processBtn.disabled = true;
         gesturesEnabled = true;
 
-        // Show success
         Swal.fire({
           icon: 'success',
           title: 'Twibbon Selesai!',
@@ -755,7 +692,6 @@
     }, 1000);
   });
 
-  // PWA Install button handlers
   if (installBtn) {
     installBtn.addEventListener('click', async () => {
       if (!deferredPrompt) return;
@@ -784,11 +720,9 @@
     });
   }
 
-  // Network event listeners
   window.addEventListener('online', updateNetworkStatus);
   window.addEventListener('offline', updateNetworkStatus);
 
-  // Canvas gesture and touch events
   canvas.addEventListener('pointerdown', (e) => {
     if (!hasImage || !gesturesEnabled) return;
     e.preventDefault();
@@ -814,14 +748,12 @@
     pointers.set(e.pointerId, {x: e.offsetX, y: e.offsetY});
     
     if (pointers.size === 1) {
-      // Pan
       const p = Array.from(pointers.values())[0];
       tx += p.x - last.x;
       ty += p.y - last.y;
       last = {x: p.x, y: p.y};
       scheduleDraw();
     } else if (pointers.size === 2 && pinch) {
-      // Pinch zoom
       const pts = Array.from(pointers.values());
       const currentDistance = distance(pts[0], pts[1]);
       const currentCenter = getCenter();
@@ -863,7 +795,6 @@
     if (pointers.size < 2) pinch = null;
   });
 
-  // Wheel zoom
   canvas.addEventListener('wheel', (e) => {
     if (!hasImage || !gesturesEnabled) return;
     e.preventDefault();
@@ -884,7 +815,6 @@
     }
   });
 
-  // Reset with confirmation
   function resetAll(){
     Swal.fire({
       title: 'Reset Semua?',
@@ -896,13 +826,11 @@
       confirmButtonColor: '#ef4444'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Perform reset
         hasImage = false; 
         img = null;
         imageRotation = 0;
         filters = { brightness: 100, contrast: 100, saturation: 100, blur: 0 };
         
-        // Reset twibbon to default
         const defaultTw = new Image();
         defaultTw.onload = () => { 
           twibbon = defaultTw; 
@@ -940,27 +868,22 @@
   resetAllTop.addEventListener('click', resetAll);
   window.addEventListener('resize', resizeCanvasToBox);
 
-  // ====== INITIALIZATION ======
 
   resizeCanvasToBox();
   scheduleDraw();
 
-  // Initialize PWA features
   handleURLParams();
   manageFocus();
   updateNetworkStatus();
   
-  // Add ripple effects to buttons
   d.querySelectorAll('button').forEach(addButtonAnimation);
   
-  // Add loading states to all async buttons
   [pickerFab, cameraFab, processBtn].forEach(btn => {
     if (btn) btn.setAttribute('aria-label', btn.textContent || btn.innerHTML);
   });
 
 })();
 
-// Add CSS for ripple effect
 const style = document.createElement('style');
 style.textContent = `
   button {

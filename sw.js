@@ -3,7 +3,6 @@ const STATIC_CACHE = 'twibbon-static-v1';
 const DYNAMIC_CACHE = 'twibbon-dynamic-v1';
 
 const STATIC_ASSETS = [
-  '/',
   'index.html',
   'manifest.json',
   'twibbon.png',
@@ -19,7 +18,6 @@ const CACHE_STRATEGIES = {
   pages: 'network-first'
 };
 
-// Install event
 self.addEventListener('install', event => {
   console.log('SW: Installing...');
   event.waitUntil(
@@ -32,7 +30,6 @@ self.addEventListener('install', event => {
   );
 });
 
-// Activate event
 self.addEventListener('activate', event => {
   console.log('SW: Activating...');
   event.waitUntil(
@@ -51,12 +48,10 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch event
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Handle different types of requests
   if (request.destination === 'image') {
     event.respondWith(cacheFirst(request));
   } else if (url.origin === location.origin) {
@@ -66,7 +61,6 @@ self.addEventListener('fetch', event => {
   }
 });
 
-// Cache strategies
 async function cacheFirst(request) {
   try {
     const cached = await caches.match(request);

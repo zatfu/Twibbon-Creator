@@ -19,22 +19,18 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Twibbon Pro" />
   
-  <!-- Icons -->
   <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png" />
   <link rel="apple-touch-icon" href="icons/icon-192x192.png" />
   
-  <!-- Local Tailwind CSS -->
   <script src="tailwindcdn.js"></script>
   
-  <!-- Preload Critical Resources -->
   <link rel="preload" href="script.js" as="script" />
   <link rel="preload" href="twibbon.png" as="image" />
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="min-h-screen bg-slate-50 overflow-x-hidden">
-  <!-- PWA Install Banner -->
   <div id="installBanner" class="fixed top-0 left-0 right-0 bg-blue-500 text-white p-3 transform -translate-y-full transition-transform duration-300 z-50 shadow-sm">
     <div class="container mx-auto flex items-center justify-between">
       <div class="flex items-center space-x-3">
@@ -74,13 +70,11 @@
     </header>
 
     <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Main Canvas Area -->
       <div class="lg:col-span-2">
         <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <div class="canvasBox relative w-full aspect-square bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 overflow-hidden hover:border-blue-400 transition-colors" id="canvasBox">
             <canvas id="stage" class="absolute inset-0 w-full h-full touch-none rounded-2xl" width="1024" height="1024"></canvas>
             
-            <!-- Floating Action Buttons -->
             <div class="absolute top-4 left-4 flex flex-col gap-3 z-10">
               <button id="pickerFab" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-lg font-medium transition-colors shadow-sm">
                 <span class="flex items-center gap-2">
@@ -96,19 +90,16 @@
               </button>
             </div>
 
-            <!-- Placeholder -->
             <div class="placeholder absolute inset-0 flex flex-col items-center justify-center text-center text-slate-500 pointer-events-none p-8" id="ph">
               <div class="text-6xl lg:text-8xl mb-6">📸</div>
               <h3 class="text-xl lg:text-2xl font-semibold mb-3 text-slate-700">Mulai Membuat Twibbon</h3>
               <p class="text-sm lg:text-base text-slate-600 max-w-md">Drag & drop gambar, pilih dari galeri, atau gunakan kamera untuk memulai</p>
             </div>
 
-            <!-- Drop Overlay -->
             <div class="dropOverlay absolute inset-0 bg-blue-100 border-2 border-blue-400 border-dashed rounded-xl hidden items-center justify-center text-blue-600 font-semibold">
               📁 Lepaskan file di sini
             </div>
 
-            <!-- Processing Overlay -->
             <div class="processMask absolute inset-0 bg-slate-900 bg-opacity-90 hidden items-center justify-center" id="mask">
               <div class="text-center">
                 <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -118,14 +109,12 @@
             </div>
           </div>
 
-          <!-- Canvas Controls -->
           <div class="mt-6 flex flex-wrap gap-3">
             <button id="processBtn" class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm" disabled>
               ✨ Buat Twibbon
             </button>
           </div>
 
-          <!-- Photo Controls -->
           <div class="photoControls mt-6 p-6 bg-slate-100 rounded-lg border border-slate-200 hidden" id="photoControls">
             <h4 class="text-slate-800 font-semibold mb-4 text-lg flex items-center gap-2">
               <span>🎨</span> Edit Foto
@@ -150,7 +139,6 @@
             </div>
           </div>
 
-          <!-- Action Buttons -->
           <div class="afterBar mt-6 hidden" id="afterBar">
             <div class="grid grid-cols-2 gap-3">
               <button id="dlBtn" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
@@ -172,9 +160,7 @@
         </div>
       </div>
 
-      <!-- Sidebar Controls -->
       <div class="space-y-6">
-        <!-- Twibbon Library -->
         <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <h3 class="text-slate-800 font-semibold mb-4 text-lg flex items-center gap-2">
             <span>🖼️</span> Pilih Twibbon
@@ -190,7 +176,6 @@
           </button>
         </div>
 
-        <!-- Transform Controls -->
         <div class="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
           <h3 class="text-slate-800 font-semibold mb-4 text-lg flex items-center gap-2">
             <span>🔄</span> Transform
@@ -211,7 +196,6 @@
           </div>
         </div>
 
-        <!-- Tips -->
         <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-6 shadow-sm">
           <h4 class="text-yellow-700 font-semibold mb-3 text-lg flex items-center gap-2">
             <span>💡</span> Tips & Tricks
@@ -238,7 +222,6 @@
       </div>
     </div>
 
-    <!-- Camera Modal -->
     <div id="cameraModal" class="fixed inset-0 bg-slate-900 bg-opacity-75 hidden items-center justify-center z-50 p-4">
       <div class="bg-white rounded-xl p-6 max-w-md w-full shadow-lg border border-gray-200">
         <h3 class="text-xl font-semibold text-slate-800 mb-4 flex items-center gap-2">
@@ -259,7 +242,6 @@
       </div>
     </div>
 
-    <!-- Network Status Indicator -->
     <div id="networkStatus" class="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-sm hidden">
       <span class="flex items-center gap-2">
         <span>📡</span>
@@ -267,12 +249,10 @@
       </span>
     </div>
 
-    <!-- Hidden Inputs -->
     <input id="fileInput" type="file" accept="image/*" class="hidden" />
     <input id="twibbonInput" type="file" accept="image/png,image/*" class="hidden" />
   </div>
 
-  <!-- Include the external JavaScript file -->
   <script src="script.js"></script>
 </body>
 </html>
